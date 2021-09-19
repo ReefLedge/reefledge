@@ -1,5 +1,6 @@
 from typing import Final, Union, List
 import os
+from multiprocessing.dummy import Lock
 from zipfile import ZipFile
 
 from .environment import Environment as Env
@@ -11,13 +12,14 @@ CPYTHON_VERSION: Final[str] = Env.cpython_version()
 
 
 def setup() -> None:
-    original_cwd: str = os.getcwd()
-    os.chdir(THIS_DIRECTORY_NAME)
+    with Lock(): # Ensure thread safety.
+        original_cwd: str = os.getcwd()
+        os.chdir(THIS_DIRECTORY_NAME)
 
-    try:
-        _setup()
-    finally:
-        os.chdir(original_cwd)
+        try:
+            _setup()
+        finally:
+            os.chdir(original_cwd)
 
 def _setup() -> None:
     remote_zip_file_path = __infer_remote_zip_file_path()
