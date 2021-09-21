@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Final, Dict, Optional, Any
 import os
 from ftplib import FTP_TLS
+from ssl import SSLContext
 
 THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
 
@@ -22,23 +23,23 @@ class FTPClient():
 
 
     target_file_path: Optional[str] # Linux path
-    priv_key_file_name: str
     cert_file_name: str
+    priv_key_file_name: str
 
     ftp_tls: FTP_TLS
 
     def __init__(self, target_file_path: Optional[str] = None) -> None:
         self.target_file_path = target_file_path
-        self.priv_key_file_name = 'ftp_server_private_key.pem'
         self.cert_file_name = 'ftp_server_certificate.pem'
-
+        self.priv_key_file_name = 'ftp_server_private_key.pem'
 
     def __enter__(self) -> FTPClient:
         self.connect()
         self.login()
-        self.disable_passive_mode()
+        #self.disable_passive_mode()
 
         return self
+
 
     def connect(self) -> None:
         try:
@@ -46,8 +47,7 @@ class FTPClient():
         except:
             self._connect_to_backup_server()
         finally:
-            self.ftp_tls.auth()
-            self.ftp_tls.prot_p()
+            self._enforce_tight_security()
 
     def _connect_to_main_server(self) -> None:
         self.__construct_FTP_TLS_instance(backup=False)
@@ -58,17 +58,30 @@ class FTPClient():
         self.ftp_tls.connect(host=self.HOSTS['backup'], port=self.PORT)
 
     def __construct_FTP_TLS_instance(self, backup: bool) -> None:
+        ssl_context = self.__get_ssl_context(backup)
+        self.ftp_tls = FTP_TLS(context=ssl_context)
+
+    def __get_ssl_context(self, backup: bool) -> SSLContext:
+        ssl_context = SSLContext()
+
         join = os.path.join
         parent_dirname = self.SSL_FILES_PARENT_DIRECTORY_NAME
         folder_name = ('backup_server' if backup else 'main_server')
 
-        self.ftp_tls = FTP_TLS(
-            keyfile=join(parent_dirname, folder_name, self.priv_key_file_name),
-            certfile=join(parent_dirname, folder_name, self.cert_file_name)
+        ssl_context.load_cert_chain(
+            certfile=join(parent_dirname, folder_name, self.cert_file_name),
+            keyfile=join(parent_dirname, folder_name, self.priv_key_file_name)
         )
 
-    def login(self, user_name: str = 'client', password: str = '') -> None:
-        self.ftp_tls.login(user=user_name, passwd=password)
+        return ssl_context
+
+    def _enforce_tight_security(self) -> None:
+        self.ftp_tls.auth()
+        self.ftp_tls.prot_p()
+
+
+    def login(self, user_name: str = 'client') -> None:
+        self.ftp_tls.login(user=user_name)
 
     def disable_passive_mode(self) -> None:
         self.ftp_tls.set_pasv(False)
