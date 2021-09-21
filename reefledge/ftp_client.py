@@ -1,10 +1,17 @@
 from __future__ import annotations
 from typing import Final, Dict, Optional, Any
-from ftplib import FTP
 import os
+from ftplib import FTP_TLS
+
+THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
 
 
 class FTPClient():
+
+    SSL_FILES_PARENT_DIRECTORY_NAME: Final[str] = os.path.join(
+        THIS_DIRECTORY_NAME,
+        'ssl_files'
+    )
 
     HOSTS: Final[Dict[str, str]] = {
         'main': '34.141.99.248',
@@ -13,31 +20,58 @@ class FTPClient():
 
     PORT: Final[int] = 21
 
-    target_file_path: Optional[str] # Unix path
-    ftp: FTP
+
+    target_file_path: Optional[str] # Linux path
+    priv_key_file_name: str
+    cert_file_name: str
+
+    ftp_tls: FTP_TLS
 
     def __init__(self, target_file_path: Optional[str] = None) -> None:
         self.target_file_path = target_file_path
-        self.ftp = FTP()
+        self.priv_key_file_name = 'ftp_server_private_key.pem'
+        self.cert_file_name = 'ftp_server_certificate.pem'
+
 
     def __enter__(self) -> FTPClient:
-        self._connect()
-        self.ftp.login(user='dstokes', passwd='oewfn8fdn_Qozz')
-        self.ftp.set_pasv(False)
+        self.connect()
+        self.login()
+        self.disable_passive_mode()
 
         return self
 
-    def _connect(self) -> None:
+    def connect(self) -> None:
         try:
-            self.ftp.connect(host=self.HOSTS['main'], port=self.PORT)
+            self._connect_to_main_server()
         except:
-            self.ftp.connect(host=self.HOSTS['backup'], port=self.PORT)
+            self._connect_to_backup_server()
+        finally:
+            self.ftp_tls.auth()
+            self.ftp_tls.prot_p()
 
-    def __exit__(self, *args: Any) -> None:
-        try:
-            self.ftp.quit()
-        except:
-            pass
+    def _connect_to_main_server(self) -> None:
+        self.__construct_FTP_TLS_instance(backup=False)
+        self.ftp_tls.connect(host=self.HOSTS['main'], port=self.PORT)
+
+    def _connect_to_backup_server(self) -> None:
+        self.__construct_FTP_TLS_instance(backup=True)
+        self.ftp_tls.connect(host=self.HOSTS['backup'], port=self.PORT)
+
+    def __construct_FTP_TLS_instance(self, backup: bool) -> None:
+        join = os.path.join
+        parent_dirname = self.SSL_FILES_PARENT_DIRECTORY_NAME
+        folder_name = ('backup_server' if backup else 'main_server')
+
+        self.ftp_tls = FTP_TLS(
+            keyfile=join(parent_dirname, folder_name, self.priv_key_file_name),
+            certfile=join(parent_dirname, folder_name, self.cert_file_name)
+        )
+
+    def login(self, user_name: str = 'client', password: str = '') -> None:
+        self.ftp_tls.login(user=user_name, passwd=password)
+
+    def disable_passive_mode(self) -> None:
+        self.ftp_tls.set_pasv(False)
 
 
     def retrieve_file(self, file_path: Optional[str] = None) -> None:
@@ -49,9 +83,16 @@ class FTPClient():
 
     def _retrieve_file(self, file_path: str) -> None:
         directory_name, file_name = os.path.split(file_path)
-        self.ftp.cwd(directory_name)
+        self.ftp_tls.cwd(directory_name)
         self.__effectively_retrieve_file(file_name)
 
     def __effectively_retrieve_file(self, file_name: str) -> None:
         with open(file_name, 'wb') as local_file:
-            self.ftp.retrbinary(f"RETR {file_name}", local_file.write)
+            self.ftp_tls.retrbinary(f"RETR {file_name}", local_file.write)
+
+
+    def __exit__(self, *args: Any) -> None:
+        try:
+            self.ftp_tls.quit()
+        except:
+            pass

@@ -1,13 +1,12 @@
 from typing import Final, Union, List
-import os
 from multiprocessing.dummy import Lock
+import os
 from zipfile import ZipFile
 
 from .environment import Environment as Env
 from .version import __version__
-from .ftp_client import FTPClient
+from .ftp_client import FTPClient, THIS_DIRECTORY_NAME
 
-THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
 CPYTHON_VERSION: Final[str] = Env.cpython_version()
 
 
