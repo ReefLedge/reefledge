@@ -11,7 +11,7 @@ class FTPClient():
 
     SSL_FILES_PARENT_DIRECTORY_NAME: Final[str] = os.path.join(
         THIS_DIRECTORY_NAME,
-        '..', 'ssl_files'
+        'ssl_files'
     )
 
     HOSTS: Final[Dict[str, str]] = {

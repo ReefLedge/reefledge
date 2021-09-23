@@ -2,4 +2,4 @@ include LICENSE.txt
 include README.txt
 include setup.cfg
 include setup.py
-recursive-include ssl_files *
+recursive-include reefledge\ftp_client\ssl_files *
