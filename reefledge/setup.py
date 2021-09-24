@@ -1,55 +1,38 @@
-from typing import Final, Union, List
+from typing import Final
 import os
 from multiprocessing.dummy import Lock
 from zipfile import ZipFile
 
-from .environment import Environment as Env
-from .version import __version__
 from .ftp_client import FTPClientPublic
+from .remote_zip_file_path import infer_remote_zip_file_path
 
 THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
-PYTHON_VERSION: Final[str] = Env.python_version()
 
 
 def setup() -> None:
-    with Lock(): # Ensure thread safety.
-        original_cwd: str = os.getcwd()
-        os.chdir(THIS_DIRECTORY_NAME)
+    if 'reefledge' not in os.listdir(THIS_DIRECTORY_NAME):
+        with Lock(): # Ensure thread safety.
+            original_cwd: str = os.getcwd()
+            os.chdir(THIS_DIRECTORY_NAME)
 
-        try:
-            _setup()
-        finally:
-            os.chdir(original_cwd)
+            try:
+                _setup()
+            finally:
+                os.chdir(original_cwd)
 
 def _setup() -> None:
-    remote_zip_file_path = infer_remote_zip_file_path()
-    __download_zip_file(remote_zip_file_path)
-    __extract_zip_file()
+    with FTPClientPublic() as ftp_client:
+        remote_zip_file_path = infer_remote_zip_file_path(ftp_client)
+        ftp_client.retrieve_file(remote_zip_file_path)
+
+    zip_file_name: str = os.path.basename(remote_zip_file_path)
+    __extract_zip_file(zip_file_name)
+
     os.remove('version.py') # Avoid duplication.
 
-def infer_remote_zip_file_path() -> str: # Leave it as a public function.
-    remote_zip_file_path: Union[List[str], str] = []
-
-    if Env.ON_WINDOWS:
-        remote_zip_file_path.append('windows')
-    else:
-        remote_zip_file_path.append('linux')
-
-    remote_zip_file_path.append(f"python_{PYTHON_VERSION}")
-    remote_zip_file_path.append(__version__)
-    remote_zip_file_path.append('reefledge.zip')
-
-    remote_zip_file_path = '/'.join(remote_zip_file_path)
-    remote_zip_file_path = '/' + remote_zip_file_path
-
-    return remote_zip_file_path
-
-def __download_zip_file(remote_zip_file_path: str) -> None:
-    with FTPClientPublic(remote_zip_file_path) as ftp_client:
-        ftp_client.retrieve_file()
-
-def __extract_zip_file() -> None:
-    with ZipFile('reefledge.zip', 'r') as zf:
+def __extract_zip_file(zip_file_name: str) -> None:
+    with ZipFile(zip_file_name, 'r') as zf:
         zf.extractall()
 
-    os.remove('reefledge.zip')
+    os.remove(zip_file_name)
+    os.rename(zip_file_name[:-4], 'reefledge')

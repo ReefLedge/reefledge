@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Final, Dict, Optional, final, Any
+from typing import Final, Dict, Optional, final, List, Any
 import os
 from abc import ABC, abstractmethod
 from ftplib import FTP_TLS
@@ -86,6 +86,9 @@ class FTPClient(ABC):
 
     def cwd(self, remote_directory_name: str) -> None:
         self.ftp_tls.cwd(remote_directory_name)
+
+    def list_directory(self, remote_directory_name: str) -> List[str]:
+        return self.ftp_tls.nlst(remote_directory_name)
 
     def disable_passive_mode(self) -> None:
         self.ftp_tls.set_pasv(False)
