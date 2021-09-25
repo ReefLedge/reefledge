@@ -2,7 +2,6 @@ from typing import Final, Union, List, Optional as Opt
 
 from .environment import Environment as Env
 from ..ftp_client import FTPClientPublic
-from ..version import __version__
 from .optimal_remote_zip_file_finder import OptimalRemoteZipFileFinder
 
 PYTHON_VERSION: Final[str] = Env.python_version()
@@ -48,6 +47,8 @@ def infer_remote_zip_file_directory_name() -> List[str]: # Public function
         remote_zip_file_directory_name.append('linux')
 
     remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
+
+    from ..version import __version__
     remote_zip_file_directory_name.append(__version__)
 
     return remote_zip_file_directory_name

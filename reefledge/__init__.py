@@ -5,7 +5,7 @@ from .setup import setup as _setup
 
 try:
     _setup()
-except error_perm:
+except (ModuleNotFoundError, error_perm):
     print(traceback.format_exc())
 else:
     from . import reefledge
