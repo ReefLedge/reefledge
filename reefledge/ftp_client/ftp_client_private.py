@@ -24,8 +24,6 @@ class FTPClientPrivate(FTPClient):
         else:
             raise RuntimeError('Invalid host address.')
 
-        super().__init__()
-
 
     def _connect(self) -> None:
         if self.host_address == self.HOSTS['main']:

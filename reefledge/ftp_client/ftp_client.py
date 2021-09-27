@@ -1,19 +1,12 @@
 from __future__ import annotations
-from typing import Final, Dict, Optional, final, List, Any
-import os
 from abc import ABC, abstractmethod
+from typing import Final, Dict, Optional, final, List, Any
 from ftplib import FTP_TLS
+from functools import cached_property
 from ssl import SSLContext
-
-THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
 
 
 class FTPClient(ABC):
-
-    SSL_FILES_PARENT_DIRECTORY_NAME: Final[str] = os.path.join(
-        THIS_DIRECTORY_NAME,
-        'ssl_files'
-    )
 
     HOSTS: Final[Dict[str, Optional[str]]] = {
         'main': '34.141.99.248',
@@ -22,11 +15,7 @@ class FTPClient(ABC):
 
     SERVER_PORT: Final[int] = 21
 
-    ssl_certificate_file_name: str
     ftp_tls: FTP_TLS
-
-    def __init__(self) -> None:
-        self.ssl_certificate_file_name = 'ftp_server_certificate.pem'
 
     def __enter__(self) -> FTPClient:
         self.connect()
@@ -50,29 +39,21 @@ class FTPClient(ABC):
 
 
     def _connect_to_main_server(self) -> None:
-        self.__construct_FTP_TLS_instance(backup=False)
-        self.ftp_tls.connect(host=self.HOSTS['main'], port=self.SERVER_PORT)
+        self.__connect(host_address=self.HOSTS['main'])
 
     def _connect_to_backup_server(self) -> None:
-        self.__construct_FTP_TLS_instance(backup=True)
-        self.ftp_tls.connect(host=self.HOSTS['backup'], port=self.SERVER_PORT)
+        self.__connect(host_address=self.HOSTS['backup'])
 
+    def __connect(self, *, host_address: str) -> None:
+        self.ftp_tls = FTP_TLS(context=self.ssl_context)
+        self.ftp_tls.connect(host=host_address, port=self.SERVER_PORT)
 
-    def __construct_FTP_TLS_instance(self, backup: bool) -> None:
-        ssl_context = self.__get_ssl_context(backup)
-        self.ftp_tls = FTP_TLS(context=ssl_context)
+    @cached_property
+    def ssl_context(self) -> SSLContext:
+        _ssl_context = SSLContext()
+        _ssl_context.load_default_certs()
 
-    def __get_ssl_context(self, backup: bool) -> SSLContext:
-        certfile: str = os.path.join(
-            self.SSL_FILES_PARENT_DIRECTORY_NAME,
-            ('backup_server' if backup else 'main_server'),
-            self.ssl_certificate_file_name
-        )
-
-        ssl_context = SSLContext()
-        ssl_context.load_cert_chain(certfile=certfile)
-
-        return ssl_context
+        return _ssl_context
 
 
     def login(self, user_name: str, password: str) -> None:
