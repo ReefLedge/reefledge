@@ -20,17 +20,13 @@ class FTPClient(ABC):
         'backup': None,
     }
 
-    PORT: Final[int] = 21
+    SERVER_PORT: Final[int] = 21
 
-
-    cert_file_name: str
-    priv_key_file_name: str
-
+    ssl_certificate_file_name: str
     ftp_tls: FTP_TLS
 
     def __init__(self) -> None:
-        self.cert_file_name = 'ftp_server_certificate.pem'
-        self.priv_key_file_name = 'ftp_server_private_key.pem'
+        self.ssl_certificate_file_name = 'ftp_server_certificate.pem'
 
     def __enter__(self) -> FTPClient:
         self.connect()
@@ -55,11 +51,11 @@ class FTPClient(ABC):
 
     def _connect_to_main_server(self) -> None:
         self.__construct_FTP_TLS_instance(backup=False)
-        self.ftp_tls.connect(host=self.HOSTS['main'], port=self.PORT)
+        self.ftp_tls.connect(host=self.HOSTS['main'], port=self.SERVER_PORT)
 
     def _connect_to_backup_server(self) -> None:
         self.__construct_FTP_TLS_instance(backup=True)
-        self.ftp_tls.connect(host=self.HOSTS['backup'], port=self.PORT)
+        self.ftp_tls.connect(host=self.HOSTS['backup'], port=self.SERVER_PORT)
 
 
     def __construct_FTP_TLS_instance(self, backup: bool) -> None:
@@ -67,16 +63,14 @@ class FTPClient(ABC):
         self.ftp_tls = FTP_TLS(context=ssl_context)
 
     def __get_ssl_context(self, backup: bool) -> SSLContext:
-        ssl_context = SSLContext()
-
-        join = os.path.join
-        parent_dirname = self.SSL_FILES_PARENT_DIRECTORY_NAME
-        folder_name = ('backup_server' if backup else 'main_server')
-
-        ssl_context.load_cert_chain(
-            certfile=join(parent_dirname, folder_name, self.cert_file_name),
-            keyfile=join(parent_dirname, folder_name, self.priv_key_file_name)
+        certfile: str = os.path.join(
+            self.SSL_FILES_PARENT_DIRECTORY_NAME,
+            ('backup_server' if backup else 'main_server'),
+            self.ssl_certificate_file_name
         )
+
+        ssl_context = SSLContext()
+        ssl_context.load_cert_chain(certfile=certfile)
 
         return ssl_context
 

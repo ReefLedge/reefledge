@@ -11,16 +11,19 @@ THIS_DIRECTORY_NAME: Final[str] = os.path.dirname(__file__)
 
 def setup() -> None:
     if 'reefledge' not in os.listdir(THIS_DIRECTORY_NAME):
-        with Lock(): # Ensure thread safety.
-            original_cwd: str = os.getcwd()
-            os.chdir(THIS_DIRECTORY_NAME)
-
-            try:
-                _setup()
-            finally:
-                os.chdir(original_cwd)
+        _setup()
 
 def _setup() -> None:
+    with Lock(): # Ensure thread safety.
+        original_cwd: str = os.getcwd()
+        os.chdir(THIS_DIRECTORY_NAME)
+
+        try:
+            _download_reefledge_compiled_cython_package()
+        finally:
+            os.chdir(original_cwd)
+
+def _download_reefledge_compiled_cython_package() -> None:
     with FTPClientPublic() as ftp_client:
         remote_zip_file_path = infer_remote_zip_file_path(ftp_client)
         ftp_client.retrieve_file(remote_zip_file_path)

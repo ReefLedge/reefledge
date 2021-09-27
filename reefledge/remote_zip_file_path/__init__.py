@@ -2,6 +2,7 @@ from typing import Final, Union, List, Optional as Opt
 
 from .environment import Environment as Env
 from ..ftp_client import FTPClientPublic
+from ..version import __version__
 from .optimal_remote_zip_file_finder import OptimalRemoteZipFileFinder
 
 PYTHON_VERSION: Final[str] = Env.python_version()
@@ -18,11 +19,15 @@ def infer_remote_zip_file_path(ftp_client: Opt[FTPClientPublic] = None) -> str:
         return _infer_remote_zip_file_path(ftp_client)
 
 def _infer_remote_zip_file_path(ftp_client: FTPClientPublic) -> str:
-    remote_zf_dirname = infer_remote_zip_file_directory_name()
-    zip_file_name = __select_remote_zip_file(remote_zf_dirname, ftp_client)
+    remote_zip_file_directory_name = infer_remote_zip_file_directory_name()
+
+    zip_file_name = __select_remote_zip_file(
+        target_remote_dir_name=remote_zip_file_directory_name,
+        ftp_client=ftp_client
+    )
 
     remote_zip_file_path: UNION
-    remote_zip_file_path = remote_zf_dirname + [zip_file_name]
+    remote_zip_file_path = remote_zip_file_directory_name + [zip_file_name]
     remote_zip_file_path = '/'.join(remote_zip_file_path)
     remote_zip_file_path = '/' + remote_zip_file_path
 
@@ -39,16 +44,12 @@ def __select_remote_zip_file(
 
 
 def infer_remote_zip_file_directory_name() -> List[str]: # Public function
-    remote_zip_file_directory_name = []
+    remote_zip_file_directory_name = [__version__]
+    remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
 
     if Env.ON_WINDOWS:
         remote_zip_file_directory_name.append('windows')
     else:
         remote_zip_file_directory_name.append('linux')
-
-    remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
-
-    from ..version import __version__
-    remote_zip_file_directory_name.append(__version__)
 
     return remote_zip_file_directory_name

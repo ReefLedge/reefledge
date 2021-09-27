@@ -10,7 +10,7 @@ def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:
     url = _get_url(ipv4_address)
 
     data: Union[str, MAPPING]
-    data = requests.get(url).text
+    data = requests.get(url).text.strip()
     data = eval(data)
 
     geo_coordinates: Union[str, PAIR]

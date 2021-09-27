@@ -1,11 +1,11 @@
-from ftplib import error_perm
+import ftplib
 import traceback
 
 from .setup import setup as _setup
 
 try:
     _setup()
-except (ModuleNotFoundError, error_perm):
+except ftplib.Error:
     print(traceback.format_exc())
 else:
     from . import reefledge
