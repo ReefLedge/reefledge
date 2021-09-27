@@ -35,6 +35,6 @@ def _download_reefledge_compiled_cython_package() -> None:
 
 def __extract_zip_file(zip_file_name: str) -> None:
     with ZipFile(zip_file_name, 'r') as zf:
-        zf.extractall(path='reefledge')
+        zf.extractall(path=THIS_DIRECTORY_NAME)
 
     os.remove(zip_file_name)
