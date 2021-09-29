@@ -13,4 +13,3 @@ else:
     del reefledge
 
     from .reefledge import *
-    from .reefledge import __version__
