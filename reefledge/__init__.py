@@ -12,4 +12,5 @@ else:
     __doc__ = reefledge.__doc__
     del reefledge
 
+    from .reefledge import __version__
     from .reefledge import *
