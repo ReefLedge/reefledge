@@ -2,10 +2,10 @@ A powerful API designed for Quantitative Finance practitioners.
 
 **reefledge** is a Python/Cython package which provides a fast, simple
 and powerful API designed to simplify the consumption of cutting edge
-density forecasting model outputs. These are generated from market data 
-on liquid financial instruments and are the result of demanding 
+density forecasting model outputs. These are generated from market data
+on liquid financial instruments and are the result of demanding
 estimation and simulation processes on a high-performance cloud cluster.
-Data is produced for a wide range of reference dates and asset classes, 
+Data is produced for a wide range of reference dates and asset classes,
 yielding forecasts for a variety of time horizons and metrics.
 
 Main Features
@@ -53,7 +53,8 @@ False
 >>> rl.APIConfig.allow_caching = False # Disable caching.
 
 Notes
------  
+-----
 Further examples assume that `reefledge` has been imported as `rl`:
->>> import reefledge as rl
+
+    >>> import reefledge as rl
 
