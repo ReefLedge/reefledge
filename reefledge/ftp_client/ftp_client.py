@@ -9,7 +9,7 @@ from ssl import SSLContext
 class FTPClient(ABC):
 
     HOSTS: Final[Dict[str, Optional[str]]] = {
-        'main': '34.141.99.248',
+        'main': 'reefledge-ftp-server-main.com',
         'backup': None,
     }
 
