@@ -10,7 +10,7 @@ class FTPClient(ABC):
 
     HOSTS: Final[Dict[str, Optional[str]]] = {
         'main': 'reefledge-ftp-server-main.com',
-        'backup': None,
+        'backup': 'reefledge-ftp-server-backup.com',
     }
 
     SERVER_PORT: Final[int] = 21
