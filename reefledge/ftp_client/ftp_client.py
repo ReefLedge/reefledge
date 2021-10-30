@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Final, Dict, Optional, final, List, Any
 from ftplib import FTP_TLS
 from functools import cached_property
-from ssl import SSLContext
+import ssl
 
 
 class FTPClient(ABC):
@@ -49,11 +49,11 @@ class FTPClient(ABC):
         self.ftp_tls.connect(host=host_address, port=self.SERVER_PORT)
 
     @cached_property
-    def ssl_context(self) -> SSLContext:
-        _ssl_context = SSLContext()
-        _ssl_context.load_default_certs()
+    def ssl_context(self) -> ssl.SSLContext:
+        ssl_context = ssl.create_default_context()
+        ssl_context.load_default_certs()
 
-        return _ssl_context
+        return ssl_context
 
 
     def login(self, user_name: str, password: str) -> None:
