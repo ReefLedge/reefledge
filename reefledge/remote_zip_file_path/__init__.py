@@ -20,7 +20,7 @@ def infer_remote_zip_file_path(ftp_client: Opt[FTPClientPublic] = None) -> str:
 def _infer_remote_zip_file_path(ftp_client: FTPClientPublic) -> str:
     remote_zip_file_directory_name = infer_remote_zip_file_directory_name()
 
-    zip_file_name = __select_remote_zip_file(
+    zip_file_name: str = __select_remote_zip_file(
         target_remote_dir_name=remote_zip_file_directory_name,
         ftp_client=ftp_client
     )
@@ -33,6 +33,7 @@ def _infer_remote_zip_file_path(ftp_client: FTPClientPublic) -> str:
     return remote_zip_file_path
 
 def __select_remote_zip_file(
+    *,
     target_remote_dir_name: List[str],
     ftp_client: FTPClientPublic) -> str:
     ###########################################################################
@@ -45,7 +46,7 @@ def __select_remote_zip_file(
 def infer_remote_zip_file_directory_name() -> List[str]: # Public function
     from ..version import __version__ # Can only import safely at runtime.
 
-    remote_zip_file_directory_name = [__version__]
+    remote_zip_file_directory_name: List[str] = [__version__]
     remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
 
     if Env.ON_WINDOWS:
