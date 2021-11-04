@@ -20,26 +20,25 @@ def setup() -> None:
 
 def _version_mismatch() -> bool:
     from .version import __version__
-    reefledge_package_wrapper_version: str = __version__
+    rl_package_wrapper_version: str = __version__
 
     from .reefledge.version import __version__
-    reefledge_core_package_version: str = __version__
+    rl_compiled_cython_package_version: str = __version__
 
-    answer: bool = \
-        reefledge_package_wrapper_version != reefledge_core_package_version
+    answer = (rl_package_wrapper_version != rl_compiled_cython_package_version)
 
     if answer:
-        __remove_reefledge_core_package()
+        __remove_reefledge_compiled_cython_package()
 
     return answer
 
-def __remove_reefledge_core_package() -> None:
-    directory_name: str = os.path.join(
+def __remove_reefledge_compiled_cython_package() -> None:
+    target_directory_name: str = os.path.join(
         THIS_DIR_NAME,
         'reefledge'
     )
 
-    shutil.rmtree(directory_name)
+    shutil.rmtree(target_directory_name)
 
 
 def _setup() -> None:
