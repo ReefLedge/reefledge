@@ -35,11 +35,11 @@ class FTPClientPrivate(FTPClient):
         super().login(user_name=self.user_name, password=self.password)
 
 
-    def upload_file(self, file_name: str, destination: List[str]) -> None:
+    def upload_file(self, local_file_name: str, destination: List[str]) -> None:
         self.cwd(remote_directory_name=destination)
 
-        with open(file_name, 'rb') as fh:
-            self.ftp_tls.storbinary(f"STOR {file_name}", fh)
+        with open(local_file_name, 'rb') as fh:
+            self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
 
     def cwd(self, remote_directory_name: List[str]) -> None:
         folder_name: str
