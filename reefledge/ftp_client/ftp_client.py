@@ -73,4 +73,4 @@ class FTPClient(ABC):
         try:
             self.ftp_tls.quit()
         except:
-            pass
+            self.ftp_tls.close()
