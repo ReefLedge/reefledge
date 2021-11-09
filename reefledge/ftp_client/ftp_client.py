@@ -4,6 +4,7 @@ from typing import Final, Dict, Optional, final, List, Any
 from ftplib import FTP_TLS
 from functools import cached_property
 import ssl
+import os
 
 
 class FTPClient(ABC):
@@ -50,14 +51,23 @@ class FTPClient(ABC):
 
     @cached_property
     def ssl_context(self) -> ssl.SSLContext:
-        ssl_context = ssl.create_default_context()
-        ssl_context.load_default_certs()
+        return ssl.create_default_context(cafile=self.ca_file_path)
 
-        return ssl_context
+    @property
+    def ca_file_path(self) -> str:
+        this_directory_name: str = os.path.dirname(__file__)
+        _ca_file_path = os.path.join(this_directory_name, 'isrgrootx1.pem')
+
+        return _ca_file_path
 
 
-    def login(self, user_name: str, password: str) -> None:
+    @abstractmethod
+    def login(self) -> None:
+        pass
+
+    def _login(self, *, user_name: str, password: str) -> None:
         self.ftp_tls.login(user=user_name, passwd=password)
+
 
     def cwd(self, remote_directory_name: str) -> None:
         self.ftp_tls.cwd(remote_directory_name)
@@ -65,12 +75,9 @@ class FTPClient(ABC):
     def list_directory(self, remote_directory_name: str) -> List[str]:
         return self.ftp_tls.nlst(remote_directory_name)
 
-    def disable_passive_mode(self) -> None:
-        self.ftp_tls.set_pasv(False)
-
 
     def __exit__(self, *args: Any) -> None:
         try:
             self.ftp_tls.quit()
         except:
-            self.ftp_tls.close()
+            self.ftp_tls.close() # Close unilaterally.

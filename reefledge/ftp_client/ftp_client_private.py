@@ -1,4 +1,5 @@
 from typing import final, List
+import os
 
 from .ftp_client import FTPClient
 
@@ -32,18 +33,21 @@ class FTPClientPrivate(FTPClient):
             self._connect_to_backup_server()
 
     def login(self) -> None:
-        super().login(user_name=self.user_name, password=self.password)
+        self._login(user_name=self.user_name, password=self.password)
 
 
     def upload_file(
         self, *,
         local_file_name: str,
         destination: List[str]) -> None:
-        ################################################################
+        #######################################################################
+        assert local_file_name in os.listdir()
         self.cwd(remote_directory_name=destination)
 
         with open(local_file_name, 'rb') as fh:
             self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
+
+        print(f"Uploaded file {local_file_name} on {self.host_address}.")
 
     def cwd(self, remote_directory_name: List[str]) -> None:
         folder_name: str

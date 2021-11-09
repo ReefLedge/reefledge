@@ -14,7 +14,7 @@ class FTPClientPublic(FTPClient):
             self._connect_to_backup_server()
 
     def login(self) -> None:
-        super().login(user_name='client', password='')
+        self._login(user_name='client', password='')
 
 
     def retrieve_file(self, remote_file_path: str) -> None:

@@ -1,4 +1,3 @@
-from typing import Final
 import os
 from multiprocessing.dummy import Lock
 import shutil
@@ -7,14 +6,12 @@ from zipfile import ZipFile
 from .ftp_client import FTPClientPublic
 from .remote_zip_file_path import infer_remote_zip_file_path
 
-THIS_DIR_NAME: Final[str] = os.path.abspath(
-    os.path.dirname(__file__)
-)
-
 
 def setup() -> None:
+    this_dir_name: str = os.path.dirname(__file__)
+
     with Lock(): # Ensure thread safety.
-        if 'reefledge' not in os.listdir(THIS_DIR_NAME) or _version_mismatch():
+        if 'reefledge' not in os.listdir(this_dir_name) or _version_mismatch():
             _setup()
 
 
@@ -34,7 +31,7 @@ def _version_mismatch() -> bool:
 
 def __remove_reefledge_compiled_cython_package() -> None:
     target_directory_name: str = os.path.join(
-        THIS_DIR_NAME,
+        os.path.dirname(__file__),
         'reefledge'
     )
 
@@ -43,7 +40,7 @@ def __remove_reefledge_compiled_cython_package() -> None:
 
 def _setup() -> None:
     original_cwd: str = os.getcwd()
-    os.chdir(THIS_DIR_NAME)
+    os.chdir(os.path.dirname(__file__))
 
     try:
         _download_reefledge_compiled_cython_package()
@@ -60,6 +57,6 @@ def _download_reefledge_compiled_cython_package() -> None:
 
 def __extract_zip_file(zip_file_name: str) -> None:
     with ZipFile(zip_file_name, 'r') as zf:
-        zf.extractall(path=THIS_DIR_NAME)
+        zf.extractall(path=os.path.dirname(__file__))
 
     os.remove(zip_file_name)
