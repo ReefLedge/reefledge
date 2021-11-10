@@ -43,11 +43,19 @@ class FTPClientPrivate(FTPClient):
         #######################################################################
         assert local_file_name in os.listdir()
         self.cwd(remote_directory_name=destination)
+        self._upload_file(local_file_name)
 
-        with open(local_file_name, 'rb') as fh:
-            self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
+    def _upload_file(self, local_file_name: str) -> None:
+        try:
+            self.ftp_tls.delete(local_file_name)
+        except:
+            pass
+        finally:
+            with open(local_file_name, 'rb') as fh:
+                self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
 
         print(f"Uploaded file {local_file_name} to {self.host_address}.")
+
 
     def cwd(self, remote_directory_name: List[str]) -> None:
         folder_name: str
