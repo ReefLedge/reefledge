@@ -47,7 +47,7 @@ class FTPClientPrivate(FTPClient):
         with open(local_file_name, 'rb') as fh:
             self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
 
-        print(f"Uploaded file {local_file_name} on {self.host_address}.")
+        print(f"Uploaded file {local_file_name} to {self.host_address}.")
 
     def cwd(self, remote_directory_name: List[str]) -> None:
         folder_name: str

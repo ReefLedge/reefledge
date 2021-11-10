@@ -29,6 +29,13 @@ The easiest way to install `reefledge` and get updates is via `pip`:
 
     $ pip install reefledge
 
+On Linux, the shell command above should return an error due to the
+`xlwings` module dependency, which is only relevant on the Windows
+platform. You can safely ignore it by preceding the installation command
+with:
+
+    $ export INSTALL_ON_LINUX=1
+
 Basic Usage
 -----------
 >>> import reefledge as rl
