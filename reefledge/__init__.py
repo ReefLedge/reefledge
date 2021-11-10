@@ -5,7 +5,7 @@ from .setup import setup as _setup
 
 try:
     _setup()
-except ftplib.Error:
+except (ftplib.Error, ImportError):
     print(traceback.format_exc())
 else:
     from . import reefledge
