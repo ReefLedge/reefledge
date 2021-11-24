@@ -41,14 +41,14 @@ Basic Usage
 >>> import reefledge as rl
 >>> rl.login(user_name='foobar', api_key='secret')
 >>> df = rl.get_point_forecasts_df(
-        target='NYSE',
+        target='USA',
         metric='STD',
         tickers=['GS', 'IBM']) # Returns a pandas DataFrame instance.
 
 Generic Error Catching
 ----------------------
 >>> try:
-        rl.get_point_forecasts_df(target='NYSE', metric='STD', tickers='GS')
+        rl.get_point_forecasts_df(target='USA', metric='STD', tickers='GS')
     except rl.Error as exc:
         print(exc)
 
