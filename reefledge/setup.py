@@ -1,8 +1,7 @@
 import os
 from multiprocessing.dummy import Lock
-import shutil
-from zipfile import ZipFile
 
+from ._filesystem_utils import remove_directory, extract_zip_file
 from .ftp_client import FTPClientPublic
 from .remote_zip_file_path import infer_remote_zip_file_path
 
@@ -35,7 +34,7 @@ def __remove_reefledge_compiled_cython_package() -> None:
         'reefledge'
     )
 
-    shutil.rmtree(target_directory_name)
+    remove_directory(target_directory_name)
 
 
 def _setup() -> None:
@@ -43,20 +42,14 @@ def _setup() -> None:
     os.chdir(os.path.dirname(__file__))
 
     try:
-        _download_reefledge_compiled_cython_package()
+        __download_reefledge_compiled_cython_package()
     finally:
         os.chdir(original_cwd)
 
-def _download_reefledge_compiled_cython_package() -> None:
+def __download_reefledge_compiled_cython_package() -> None:
     with FTPClientPublic() as ftp_client:
         remote_zip_file_path = infer_remote_zip_file_path(ftp_client)
         ftp_client.retrieve_file(remote_zip_file_path)
 
     zip_file_name: str = os.path.basename(remote_zip_file_path)
-    __extract_zip_file(zip_file_name)
-
-def __extract_zip_file(zip_file_name: str) -> None:
-    with ZipFile(zip_file_name, 'r') as zf:
-        zf.extractall(path=os.path.dirname(__file__))
-
-    os.remove(zip_file_name)
+    extract_zip_file(zip_file_name)
