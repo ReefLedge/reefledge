@@ -40,10 +40,10 @@ Basic Usage
 -----------
 >>> import reefledge as rl
 >>> rl.login(user_name='foobar', api_key='secret')
->>> df = rl.get_point_forecasts_df(
+>>> df = rl.get_point_forecasts_df( # Returns a pandas DataFrame instance.
         target='USA',
         metric='STD',
-        tickers=['GS', 'IBM']) # Returns a pandas DataFrame instance.
+        tickers=['GS', 'IBM'])
 
 Generic Error Catching
 ----------------------
