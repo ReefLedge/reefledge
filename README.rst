@@ -17,7 +17,6 @@ Here are just a few of the things that make `reefledge` special:
   * Fast and robust Cython codebase.
   * Multithreading capabilities to overcome I/O overheads.
   * Smart and 'respectful' (in terms of RAM usage) caching.
-  * TLS encryption and server certificate validation.
   * Efficient and highly available back end, featuring global load
     balancing, optimized connection pooling and extensive database table
     partitioning, besides an intelligent use of indexes to speed up SQL
