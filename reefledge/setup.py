@@ -1,6 +1,5 @@
-from typing import Final
 import os
-from multiprocessing.dummy import Lock
+from threading import Lock
 
 from ._filesystem_utils import remove_directory, extract_zip_file
 from .ftp_client import FTPClientPublic
@@ -8,10 +7,10 @@ from .remote_zip_file_path import infer_remote_zip_file_path
 
 
 def setup() -> None:
-    this_directory_name: Final[str] = os.path.dirname(__file__)
+    this_directory_name: str = os.path.abspath(os.path.dirname(__file__))
 
     with Lock(): # Ensure thread safety.
-        original_cwd = os.getcwd()
+        original_cwd: str = os.getcwd()
         os.chdir(this_directory_name)
 
         try:
@@ -31,13 +30,14 @@ def _setup() -> None:
         __download_reefledge_compiled_cython_package()
 
 def __version_mismatch() -> bool:
-    from .version import __version__
-    wrapper_version: str = __version__
+    from .version import __version__ as wrapper_version
 
-    from .reefledge.version import __version__
-    compiled_cython_package_version: str = __version__
-
-    return (wrapper_version != compiled_cython_package_version)
+    try:
+        from .reefledge.version import __version__ as cython_package_version
+    except ModuleNotFoundError:
+        return True
+    else:
+        return (wrapper_version != cython_package_version)
 
 def __download_reefledge_compiled_cython_package() -> None:
     with FTPClientPublic() as ftp_client:
