@@ -6,5 +6,5 @@ import pdoc
 
 __pdoc__: Final[Dict[str, bool]] = {'__version__': True}
 
-__version__: Final[str] = '1.3.0' + '-alpha.2'
+__version__: Final[str] = '1.3.0' + '-alpha.3'
 """Package version number"""

@@ -51,11 +51,17 @@ class FTPClient(ABC):
 
     @cached_property
     def ssl_context(self) -> ssl.SSLContext:
-        return ssl.create_default_context(cafile=self.ca_file_path)
+        try:
+            _ssl_context = ssl.create_default_context(cafile=self.ca_file_path)
+        except Exception as exception:
+            error_message: str = f'Invalid `cafile`: "{self.ca_file_path}"'
+            raise exception.__class__(error_message)
+        else:
+            return _ssl_context
 
-    @property
+    @cached_property
     def ca_file_path(self) -> str:
-        this_directory_name: str = os.path.dirname(__file__)
+        this_directory_name: str = os.path.abspath(os.path.dirname(__file__))
         _ca_file_path = os.path.join(this_directory_name, 'isrgrootx1.pem')
 
         return _ca_file_path
