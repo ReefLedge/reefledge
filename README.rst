@@ -13,6 +13,7 @@ Main Features
 Here are just a few of the things that make `reefledge` special:
 
   * Intuitive object oriented interface.
+  * Type checking at runtime of all public functions/methods.
   * Tight integration with Microsoft Excel.
   * Fast and robust Cython codebase.
   * Multithreading capabilities to overcome I/O overheads.
@@ -51,8 +52,8 @@ Generic Error Catching
     except rl.Error as exc:
         print(exc)
 
-Configuration
--------------
+Basic Configuration
+-------------------
 >>> rl.APIConfig.allow_caching
 True
 >>> rl.APIConfig.allow_tickers_sorting
