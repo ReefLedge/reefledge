@@ -1,5 +1,6 @@
 import os
 from threading import Lock
+import logging
 
 from ._filesystem_utils import remove_directory, extract_zip_file
 from .ftp_client import FTPClientPublic
@@ -35,6 +36,9 @@ def __version_mismatch() -> bool:
     try:
         from .reefledge.version import __version__ as cython_package_version
     except ModuleNotFoundError:
+        return True
+    except ImportError:
+        logging.getLogger('reefledge').exception('Version mismatch.')
         return True
     else:
         return (wrapper_version != cython_package_version)
