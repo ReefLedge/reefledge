@@ -1,5 +1,4 @@
 import os
-from threading import Lock
 import logging
 
 from ._filesystem_utils import remove_directory, extract_zip_file
@@ -9,15 +8,13 @@ from .remote_zip_file_path import infer_remote_zip_file_path
 
 def setup() -> None:
     this_directory_name: str = os.path.abspath(os.path.dirname(__file__))
+    original_cwd: str = os.getcwd()
+    os.chdir(this_directory_name)
 
-    with Lock(): # Ensure thread safety.
-        original_cwd: str = os.getcwd()
-        os.chdir(this_directory_name)
-
-        try:
-            _setup()
-        finally:
-            os.chdir(original_cwd)
+    try:
+        _setup()
+    finally:
+        os.chdir(original_cwd)
 
 def _setup() -> None:
     if 'garbage' in os.listdir():
