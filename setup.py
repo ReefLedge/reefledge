@@ -26,6 +26,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Office/Business :: Financial :: Investment',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Typing :: Typed',
