@@ -10,5 +10,5 @@ else:
     __pdoc__: Final[Dict[str, bool]] = {'__version__': True}
 
 # Do NOT use double quotes!
-__version__: Final[str] = '1.4.0' + '-beta.9'
+__version__: Final[str] = '1.4.0' + '-beta.10'
 """Package version number"""

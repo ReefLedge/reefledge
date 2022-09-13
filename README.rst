@@ -10,7 +10,7 @@ yielding forecasts for a variety of time horizons and metrics.
 
 Main Features
 -------------
-Here are just a few of the things that make `reefledge` special:
+Here are just a few of the things that make <code>reefledge</code> special:
 
   * Intuitive object oriented interface.
   * Type checking at runtime of all public functions/methods.
@@ -25,7 +25,7 @@ Here are just a few of the things that make `reefledge` special:
 
 Installation
 ------------
-The easiest way to install `reefledge` and get updates is via `pip`:
+The easiest way to install <code>reefledge</code> and get updates is via `pip`:
 
     $ pip install reefledge
 
@@ -62,7 +62,7 @@ False
 
 Notes
 -----
-Further examples assume that `reefledge` has been imported as `rl`:
+Further examples assume that <code>reefledge</code> has been imported as `rl`:
 
     >>> import reefledge as rl
 
