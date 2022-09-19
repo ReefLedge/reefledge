@@ -1,7 +1,7 @@
 import os
 import logging
 
-from ._filesystem_utils import remove_directory, extract_zip_file
+from .utils.filesystem_utils import remove_directory, extract_zip_file
 from .ftp_client import FTPClientPublic
 from .remote_zip_file_path import infer_remote_zip_file_path
 

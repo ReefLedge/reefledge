@@ -13,5 +13,4 @@ else:
     rl.__doc__ = ""
     del rl
 
-    from .reefledge import __version__
     from .reefledge import *

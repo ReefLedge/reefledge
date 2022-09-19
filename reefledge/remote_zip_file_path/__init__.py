@@ -1,6 +1,6 @@
 from typing import Final, Union, List, Optional as Opt
 
-from .environment import Environment as Env
+from ..utils.environment import Environment as Env
 from ..ftp_client import FTPClientPublic
 from .optimal_remote_zip_file_finder import OptimalRemoteZipFileFinder
 
@@ -48,10 +48,6 @@ def infer_remote_zip_file_directory_name() -> List[str]: # Public function
 
     remote_zip_file_directory_name: List[str] = [__version__]
     remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
-
-    if Env.ON_WINDOWS:
-        remote_zip_file_directory_name.append('windows')
-    else:
-        remote_zip_file_directory_name.append('linux')
+    remote_zip_file_directory_name.append(Env().os_name)
 
     return remote_zip_file_directory_name
