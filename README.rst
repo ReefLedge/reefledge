@@ -1,21 +1,50 @@
 A powerful API designed for Quantitative Finance practitioners.
 
-**reefledge** is a Python/Cython package which provides a fast, simple
-and powerful API designed to simplify the consumption of cutting-edge
-density forecasting model outputs. These are generated from market data
-on liquid financial instruments and are the result of demanding
-estimation and simulation processes on a high-performance cloud cluster.
-Data is produced for a wide range of reference dates and asset classes,
-yielding forecasts for a variety of time horizons and metrics.
+**reefledge** is a Python package which provides a fast, simple and
+powerful API designed to simplify the retrieval of price/return density
+forecasts (on a ticker-by-ticker basis) generated from cutting-edge Time
+Series Analysis models. These models consume market data on liquid
+financial assets and require demanding estimation and simulation steps,
+both accomplished on a high-performance cloud cluster.
+Forecasts are produced for a wide range of reference dates and several
+asset classes, covering multiple time/investment horizons for a variety
+of metrics.
+
+Delivery Frequency
+------------------
+Forecasts are generated on a daily basis.
+
+Data Frequency
+--------------
+All models consume daily-frequency data.
+
+Data Reporting Lag
+------------------
+Usually, every ticker which passes our demanding filtering criteria
+requires around one minute of processing on a Google Cloud C2 compute
+engine with a single vCPU and four gigabytes of RAM.
+Our cluster boots as soon as the latest market data is available
+and, at the time of writing, scales up to 120 vCPUs.
+
+Data History
+------------
+In general, expect forecasts to be readily accessible for reference
+dates going back at least four years.
+
+Data Coverage
+-------------
+Currently, only the 'NYSE' target is in production. Nonetheless,
+multiple targets - such as 'NASDAQ' - have already been extensively
+tested and will be released soon.
 
 Main Features
 -------------
-Here are just a few of the things that make <code>reefledge</code> special:
+Here are just a few of the things that make `reefledge` special:
 
   * Intuitive object oriented interface.
   * Type checking at runtime of all public functions/methods.
-  * Tight integration with Microsoft Excel.
-  * Fast and robust Cython codebase.
+  * Seamless integration with Microsoft Excel.
+  * Fast and robust cythonized codebase.
   * Multithreading capabilities to overcome I/O overheads.
   * Smart and 'respectful' (in terms of RAM usage) caching.
   * Efficient and highly available back end, featuring global load
@@ -25,7 +54,7 @@ Here are just a few of the things that make <code>reefledge</code> special:
 
 Installation
 ------------
-The easiest way to install <code>reefledge</code> and get updates is via `pip`:
+The easiest way to install `reefledge` and get updates is via `pip`:
 
     $ pip install reefledge
 
@@ -45,6 +74,15 @@ Basic Usage
         metric='STD',
         tickers=['GS', 'IBM'])
 
+Advanced Usage
+--------------
+Advanced users should refer to the following functions/classes:
+
+  * `reefledge.reefledge.front_end.get.get` for retrieving and parsing data into a `reefledge.reefledge.back_end.data_wrapper.data_wrapper.DataWrapper` instance.
+  * `reefledge.reefledge.front_end.get_point_forecasts_df.get_point_forecasts_df` for retrieving and parsing data into a `pandas.core.frame.DataFrame` instance.
+  * `reefledge.reefledge.front_end.list_tickers.list_tickers` for querying all available tickers associated with a particular target.
+  * `reefledge.reefledge.back_end.api_config.api_config.APIConfig` for configuring the API.
+
 Generic Error Catching
 ----------------------
 >>> try:
@@ -62,7 +100,7 @@ False
 
 Notes
 -----
-Further examples assume that <code>reefledge</code> has been imported as `rl`:
+Further examples assume that `reefledge` has been imported as `rl`:
 
     >>> import reefledge as rl
 
