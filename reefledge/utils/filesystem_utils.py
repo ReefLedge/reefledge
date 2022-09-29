@@ -48,9 +48,9 @@ def __change_file_permissions(*, root_directory_name: str) -> None:
 def __assemble_shell_command(target_directory_name: str) -> str:
     shell_command: str
     if (ON_LINUX or ON_MAC_OS):
-        shell_command = f'rm -rf {directory_name}'
+        shell_command = f'rm -rf {target_directory_name}'
     elif ON_WINDOWS:
-        shell_command = f'rmdir /s /q {directory_name}'
+        shell_command = f'rmdir /s /q {target_directory_name}'
     else:
         raise OSError('Unsupported operating system.')
 

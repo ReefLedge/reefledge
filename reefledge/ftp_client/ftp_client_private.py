@@ -65,4 +65,4 @@ class FTPClientPrivate(FTPClient):
             except:
                 pass
             finally:
-                super().cwd(folder_name)
+                self._cwd(folder_name)

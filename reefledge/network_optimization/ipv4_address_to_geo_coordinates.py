@@ -1,4 +1,4 @@
-from typing import Tuple, Optional as Opt, Dict, Union, List
+from typing import Tuple, Optional as Opt, Dict, Union, List, cast
 
 import requests
 
@@ -12,7 +12,12 @@ def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:
 
     geo_coordinates: Union[List[str], PAIR]
     geo_coordinates = data['loc'].split(',')
-    geo_coordinates = tuple([float(c) for c in geo_coordinates])
+    assert len(geo_coordinates) == 2
+
+    geo_coordinates = cast(
+        PAIR,
+        tuple([float(c) for c in geo_coordinates])
+    )
 
     return geo_coordinates
 

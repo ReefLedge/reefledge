@@ -3,12 +3,13 @@ A powerful API designed for Quantitative Finance practitioners.
 **reefledge** is a Python package which provides a fast, simple and
 powerful API designed to simplify the retrieval of price/return density
 forecasts (on a ticker-by-ticker basis) generated from cutting-edge Time
-Series Analysis models. These models consume market data on liquid
-financial assets and require demanding estimation and simulation steps,
-both accomplished on a high-performance cloud cluster.
-Forecasts are produced for a wide range of reference dates and several
-asset classes, covering multiple time/investment horizons for a variety
-of metrics.
+Series Analysis models.
+Our algorithms consume market data on liquid financial assets and
+require demanding estimation and simulation steps, both accomplished on
+a high-performance cloud cluster.
+Forecasts are produced for a wide range of reference dates and
+investment horizons, covering multiple metrics for a variety of asset
+classes.
 
 Delivery Frequency
 ------------------
@@ -78,10 +79,17 @@ Advanced Usage
 --------------
 Advanced users should refer to the following functions/classes:
 
-  * `reefledge.reefledge.front_end.get.get` for retrieving and parsing data into a `reefledge.reefledge.back_end.data_wrapper.data_wrapper.DataWrapper` instance.
-  * `reefledge.reefledge.front_end.get_point_forecasts_df.get_point_forecasts_df` for retrieving and parsing data into a `pandas.core.frame.DataFrame` instance.
-  * `reefledge.reefledge.front_end.list_tickers.list_tickers` for querying all available tickers associated with a particular target.
-  * `reefledge.reefledge.back_end.api_config.api_config.APIConfig` for configuring the API.
+  * `reefledge.reefledge.front_end.get.get`
+    for retrieving and parsing data into a
+    `reefledge.reefledge.back_end.data_wrapper.data_wrapper.DataWrapper` instance.
+  * `reefledge.reefledge.front_end.get_point_forecasts_df.get_point_forecasts_df`
+    for retrieving and parsing data into a
+    `pandas.core.frame.DataFrame` instance.
+  * `reefledge.reefledge.front_end.list_tickers.list_tickers`
+    for querying all available tickers associated with a particular
+    target.
+  * `reefledge.reefledge.back_end.api_config.api_config.APIConfig`
+    for configuring the API.
 
 Generic Error Catching
 ----------------------

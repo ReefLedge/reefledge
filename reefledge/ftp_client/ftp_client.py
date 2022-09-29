@@ -1,15 +1,20 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from abc import ABC, abstractmethod
-from typing import Final, Dict, Optional, final, List, Any
+from typing import Final, Dict, final, List, Any
 from ftplib import FTP_TLS
 from functools import cached_property
 import ssl
 import os
 
+if TYPE_CHECKING:
+    from . import FTPClient_type
+
 
 class FTPClient(ABC):
 
-    HOSTS: Final[Dict[str, Optional[str]]] = {
+    HOSTS: Final[Dict[str, str]] = {
         'main': 'reefledge-ftp-server-main.com',
         'backup': 'reefledge-ftp-server-backup.com',
     }
@@ -18,7 +23,7 @@ class FTPClient(ABC):
 
     ftp_tls: FTP_TLS
 
-    def __enter__(self) -> FTPClient:
+    def __enter__(self) -> FTPClient_type:
         self.connect()
         self.login()
 
@@ -75,7 +80,8 @@ class FTPClient(ABC):
         self.ftp_tls.login(user=user_name, passwd=password)
 
 
-    def cwd(self, remote_directory_name: str) -> None:
+    @final
+    def _cwd(self, remote_directory_name: str) -> None:
         self.ftp_tls.cwd(remote_directory_name)
 
     def list_directory(self, remote_directory_name: str) -> List[str]:
