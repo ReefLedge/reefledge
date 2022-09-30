@@ -1,4 +1,4 @@
-from typing import final
+from typing import final, Optional
 import os
 
 from .ftp_client import FTPClient
@@ -7,11 +7,11 @@ from .ftp_client import FTPClient
 @final
 class FTPClientPublic(FTPClient):
 
-    def _connect(self) -> None:
+    def _connect(self, cafile: Optional[str]) -> None:
         try:
-            self._connect_to_main_server()
-        except:
-            self._connect_to_backup_server()
+            self._connect_to_main_server(cafile)
+        except TimeoutError:
+            self._connect_to_backup_server(cafile)
 
     def login(self) -> None:
         self._login(user_name='client', password='')

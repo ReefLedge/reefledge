@@ -1,4 +1,4 @@
-from typing import final, List
+from typing import final, Optional, List
 import os
 
 from .ftp_client import FTPClient
@@ -15,22 +15,24 @@ class FTPClientPrivate(FTPClient):
         self,
         user_name: str,
         password: str,
-        host_address: str) -> None:
-        ################################################################
+        host_address: str
+    ) -> None:
         self.user_name = user_name
         self.password = password
+        self._set_host_address(host_address)
 
+    def _set_host_address(self, host_address: str) -> None:
         if host_address in self.HOSTS.values():
             self.host_address = host_address
         else:
             raise RuntimeError('Invalid host address.')
 
 
-    def _connect(self) -> None:
+    def _connect(self, cafile: Optional[str]) -> None:
         if self.host_address == self.HOSTS['main']:
-            self._connect_to_main_server()
+            self._connect_to_main_server(cafile)
         else:
-            self._connect_to_backup_server()
+            self._connect_to_backup_server(cafile)
 
     def login(self) -> None:
         self._login(user_name=self.user_name, password=self.password)
@@ -39,8 +41,8 @@ class FTPClientPrivate(FTPClient):
     def upload_file(
         self, *,
         local_file_name: str,
-        destination: List[str]) -> None:
-        #######################################################################
+        destination: List[str]
+    ) -> None:
         assert local_file_name in os.listdir()
         self.cwd(remote_directory_name=destination)
         self._upload_file(local_file_name)
