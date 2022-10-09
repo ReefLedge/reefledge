@@ -24,7 +24,7 @@ class FTPClient(ABC):
     ftp_tls: FTP_TLS
 
     @cached_property
-    def ca_file_path(self) -> str:
+    def fallback_ca_file_path(self) -> str:
         this_directory_name: str = os.path.abspath(os.path.dirname(__file__))
         ca_file_path_ = os.path.join(this_directory_name, 'isrgrootx1.pem')
 
@@ -32,13 +32,14 @@ class FTPClient(ABC):
 
 
     @final
-    def connect(self, cafile: Optional[str] = None) -> None:
-        self._connect(cafile)
+    def connect(self) -> None:
+        self._connect(cafile=None)
 
         try:
             self._enforce_tight_security()
         except ssl.SSLCertVerificationError:
-            self.connect(cafile=self.ca_file_path)
+            self._connect(cafile=self.fallback_ca_file_path)
+            self._enforce_tight_security()
 
     @abstractmethod
     def _connect(self, cafile: Optional[str]) -> None:
@@ -53,21 +54,21 @@ class FTPClient(ABC):
     @final
     def _connect_to_main_server(self, cafile: Optional[str]) -> None:
         self.__connect(
-            host_address=self.HOSTS['main'],
+            host=self.HOSTS['main'],
             cafile=cafile
         )
 
     @final
     def _connect_to_backup_server(self, cafile: Optional[str]) -> None:
         self.__connect(
-            host_address=self.HOSTS['backup'],
+            host=self.HOSTS['backup'],
             cafile=cafile
         )
 
-    def __connect(self, *, host_address: str, cafile: Optional[str]) -> None:
+    def __connect(self, *, host: str, cafile: Optional[str]) -> None:
         ssl_context = self.__create_ssl_context(cafile)
         self.ftp_tls = FTP_TLS(context=ssl_context)
-        self.ftp_tls.connect(host=host_address, port=self.SERVER_PORT)
+        self.ftp_tls.connect(host=host, port=self.SERVER_PORT)
 
     def __create_ssl_context(self, cafile: Optional[str]) -> ssl.SSLContext:
         try:
@@ -76,8 +77,8 @@ class FTPClient(ABC):
             if cafile is None:
                 raise
             else:
-                error_message: str = f'Invalid `cafile`: "{self.ca_file_path}"'
-                raise exception.__class__(error_message)
+                error_msg = f'Invalid `cafile`: "{self.fallback_ca_file_path}"'
+                raise exception.__class__(error_msg)
         else:
             return ssl_context
 
