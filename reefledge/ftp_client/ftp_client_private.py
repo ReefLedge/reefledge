@@ -1,4 +1,4 @@
-from typing import final, Optional, List
+from typing import final, List
 import os
 
 from .ftp_client import FTPClient
@@ -9,37 +9,40 @@ class FTPClientPrivate(FTPClient):
 
     user_name: str
     password: str
-    host_address: str
+    host: str
 
     def __init__(
         self,
         user_name: str,
         password: str,
-        host_address: str
+        host: str
     ) -> None:
+        super().__init__()
+
         self.user_name = user_name
         self.password = password
-        self._set_host_address(host_address)
+        self._set_host(host)
 
-    def _set_host_address(self, host_address: str) -> None:
-        if host_address in self.HOSTS.values():
-            self.host_address = host_address
+    def _set_host(self, host: str) -> None:
+        if host in self.HOSTS.values():
+            self.host = host
         else:
-            raise RuntimeError('Invalid host address.')
+            raise RuntimeError(f"Invalid host '{self.host}'")
 
 
-    def _connect(self, cafile: Optional[str]) -> None:
-        if self.host_address == self.HOSTS['main']:
-            self._connect_to_main_server(cafile)
+    def _connect(self) -> None:
+        if self.host == self.HOSTS['main']:
+            self._connect_to_main_server()
         else:
-            self._connect_to_backup_server(cafile)
+            self._connect_to_backup_server()
 
     def login(self) -> None:
         self._login(user_name=self.user_name, password=self.password)
 
 
     def upload_file(
-        self, *,
+        self,
+        *,
         local_file_name: str,
         destination: List[str]
     ) -> None:
@@ -53,10 +56,10 @@ class FTPClientPrivate(FTPClient):
         except:
             pass
         finally:
-            with open(local_file_name, 'rb') as fh:
+            with open(local_file_name, mode='rb') as fh:
                 self.ftp_tls.storbinary(f"STOR {local_file_name}", fh)
 
-        print(f"Uploaded file {local_file_name} to {self.host_address}.")
+        print(f"Uploaded file {local_file_name} to {self.host}")
 
 
     def cwd(self, remote_directory_name: List[str]) -> None:

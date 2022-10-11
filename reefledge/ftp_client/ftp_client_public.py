@@ -1,17 +1,40 @@
-from typing import final, Optional
+from typing import Final, final
 import os
 
 from .ftp_client import FTPClient
+
+INSTALLING_REEFLEDGE_EXCEL_ADDIN: Final[bool] = eval(
+    os.environ.get('INSTALLING_REEFLEDGE_EXCEL_ADDIN', 'False')
+)
 
 
 @final
 class FTPClientPublic(FTPClient):
 
-    def _connect(self, cafile: Optional[str]) -> None:
+    def __enter__(self) -> FTPClientPublic:
+        super().__enter__()
+
         try:
-            self._connect_to_main_server(cafile)
+            self._probe_data_connection()
         except TimeoutError:
-            self._connect_to_backup_server(cafile)
+            if INSTALLING_REEFLEDGE_EXCEL_ADDIN:
+                raise # Since the target folder is available locally...
+            else:
+                self.cafile = None
+                self.check_hostname = False
+                super().__enter__()
+
+        return self
+
+    def _probe_data_connection(self) -> None:
+        self.list_directory()
+
+
+    def _connect(self) -> None:
+        try:
+            self._connect_to_main_server()
+        except TimeoutError:
+            self._connect_to_backup_server()
 
     def login(self) -> None:
         self._login(user_name='client', password='')
@@ -23,5 +46,5 @@ class FTPClientPublic(FTPClient):
         self._retrieve_file(file_name)
 
     def _retrieve_file(self, file_name: str) -> None:
-        with open(file_name, 'wb') as local_file:
+        with open(file_name, mode='wb') as local_file:
             self.ftp_tls.retrbinary(f"RETR {file_name}", local_file.write)

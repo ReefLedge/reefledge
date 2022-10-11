@@ -1,18 +1,12 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-from abc import ABC, abstractmethod
-from typing import Final, Dict, final, Optional, List, Any
-from ftplib import FTP_TLS
-from functools import cached_property
-import os
+from abc import ABC
+from typing import Final, Dict, final, Optional, List
 import ssl
+from ftplib import FTP_TLS
 
-if TYPE_CHECKING:
-    from . import FTPClient_type
+from .ftp_client_base import FTPClientBase
 
 
-class FTPClient(ABC):
+class FTPClient(FTPClientBase, ABC):
 
     HOSTS: Final[Dict[str, str]] = {
         'main': 'reefledge-ftp-server-main.com',
@@ -21,93 +15,45 @@ class FTPClient(ABC):
 
     SERVER_PORT: Final[int] = 21
 
-    ftp_tls: FTP_TLS
-
-    @cached_property
-    def fallback_ca_file_path(self) -> str:
-        this_directory_name: str = os.path.abspath(os.path.dirname(__file__))
-        ca_file_path_ = os.path.join(this_directory_name, 'isrgrootx1.pem')
-
-        return ca_file_path_
-
+    @final
+    def _connect_to_main_server(self) -> None:
+        self.__connect(host=self.HOSTS['main'])
 
     @final
-    def connect(self) -> None:
-        self._connect(cafile=None)
+    def _connect_to_backup_server(self) -> None:
+        self.__connect(host=self.HOSTS['backup'])
 
-        try:
-            self._enforce_tight_security()
-        except ssl.SSLCertVerificationError:
-            self._connect(cafile=self.fallback_ca_file_path)
-            self._enforce_tight_security()
-
-    @abstractmethod
-    def _connect(self, cafile: Optional[str]) -> None:
-        pass
-
-    @final
-    def _enforce_tight_security(self) -> None:
-        self.ftp_tls.auth()
-        self.ftp_tls.prot_p()
-
-
-    @final
-    def _connect_to_main_server(self, cafile: Optional[str]) -> None:
-        self.__connect(
-            host=self.HOSTS['main'],
-            cafile=cafile
-        )
-
-    @final
-    def _connect_to_backup_server(self, cafile: Optional[str]) -> None:
-        self.__connect(
-            host=self.HOSTS['backup'],
-            cafile=cafile
-        )
-
-    def __connect(self, *, host: str, cafile: Optional[str]) -> None:
-        ssl_context = self.__create_ssl_context(cafile)
+    def __connect(self, *, host: str) -> None:
+        ssl_context = self.__create_ssl_context()
         self.ftp_tls = FTP_TLS(context=ssl_context)
         self.ftp_tls.connect(host=host, port=self.SERVER_PORT)
 
-    def __create_ssl_context(self, cafile: Optional[str]) -> ssl.SSLContext:
+    def __create_ssl_context(self) -> ssl.SSLContext:
         try:
-            ssl_context = ssl.create_default_context(cafile=cafile)
+            ssl_context = ssl.create_default_context(cafile=self.cafile)
         except Exception as exception:
-            if cafile is None:
+            if self.cafile is None:
                 raise
             else:
                 error_msg = f'Invalid `cafile`: "{self.fallback_ca_file_path}"'
                 raise exception.__class__(error_msg)
         else:
+            ssl_context.check_hostname = self.check_hostname
             return ssl_context
-
-
-    @abstractmethod
-    def login(self) -> None:
-        pass
-
-    @final
-    def _login(self, *, user_name: str, password: str) -> None:
-        self.ftp_tls.login(user=user_name, passwd=password)
 
 
     @final
     def _cwd(self, remote_directory_name: str) -> None:
         self.ftp_tls.cwd(remote_directory_name)
 
-    def list_directory(self, remote_directory_name: str) -> List[str]:
-        return self.ftp_tls.nlst(remote_directory_name)
+    @final
+    def list_directory(
+        self,
+        remote_directory_name: Optional[str] = None
+    ) -> List[str]:
+        args: List[str] = []
 
+        if remote_directory_name is not None:
+            args.append(remote_directory_name)
 
-    def __enter__(self) -> FTPClient:
-        self.connect()
-        self.login()
-
-        return self
-
-    def __exit__(self, *args: Any) -> None:
-        try:
-            self.ftp_tls.quit()
-        except:
-            self.ftp_tls.close() # Close unilaterally.
+        return self.ftp_tls.nlst(*args)
