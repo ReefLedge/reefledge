@@ -21,7 +21,7 @@ class FTPClientPublic(FTPClient):
                 raise # Since the target folder is available locally...
             else:
                 self.cafile = None
-                self.check_hostname = False
+                self.check_hostname = False # Solution of last resort...
                 super().__enter__()
 
         return self
