@@ -20,7 +20,7 @@ class NearestGeoCoordinatesPair():
 
 
     @property
-    def index(self) -> int:
+    def index(self) -> np.int64:
         distances: List[float] = []
         self._compute_distances(distances)
 

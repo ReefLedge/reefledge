@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 from abc import ABC, abstractmethod
 from typing import Optional, final, Any
@@ -7,9 +6,6 @@ from ftplib import FTP_TLS
 from functools import cached_property
 import os
 import ssl
-
-if TYPE_CHECKING:
-    from . import FTPClientBase_type
 
 
 class FTPClientBase(ABC):
@@ -63,12 +59,13 @@ class FTPClientBase(ABC):
         self.ftp_tls.login(user=user_name, passwd=password, secure=True)
 
 
-    def __enter__(self) -> FTPClientBase_type:
+    def __enter__(self) -> FTPClientBase:
         self.connect()
         self.login()
 
         return self
 
+    @final
     def __exit__(self, *args: Any) -> None:
         try:
             self.ftp_tls.quit()

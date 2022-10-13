@@ -1,6 +1,8 @@
 from typing import List, Tuple
 from functools import cached_property
 
+import numpy as np
+
 from ..ftp_client import FTPClientPublic
 from ..network_optimization import NearestGeoCoordinatesPair
 
@@ -40,5 +42,5 @@ class OptimalRemoteZipFileFinder():
         return self.remote_zip_file_names[self.optimal_idx]
 
     @property
-    def optimal_idx(self) -> int:
+    def optimal_idx(self) -> np.int64:
         return NearestGeoCoordinatesPair(self.geo_coordinates_pairs).index

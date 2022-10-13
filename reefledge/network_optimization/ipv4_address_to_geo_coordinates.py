@@ -6,12 +6,30 @@ PAIR = Tuple[float, float]
 
 
 def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:
-    url: str = _get_url(ipv4_address)
-    response = requests.get(url)
-    data: Dict[str, str] = response.json()
+    data = _get_data_in_json_format(ipv4_address)
+    geo_coordinates = _extract_geo_coordinates(data)
 
+    return geo_coordinates
+
+
+def _get_data_in_json_format(ipv4_address: Opt[str]) -> Dict[str, str]:
+    url: str = __assemble_url(ipv4_address)
+    response = requests.get(url)
+    return response.json()
+
+def __assemble_url(ipv4_address: Opt[str]) -> str:
+    url: str = 'http://ipinfo.io/' # Not HTTPS
+
+    if ipv4_address is not None:
+        url += f"{ipv4_address}/"
+
+    url += 'json'
+    return url
+
+
+def _extract_geo_coordinates(data: Dict[str, str]) -> PAIR:
     geo_coordinates: Union[List[str], PAIR]
-    geo_coordinates = data['loc'].split(',')
+    geo_coordinates = data['loc'].split(',') # list[str]
     assert len(geo_coordinates) == 2
 
     geo_coordinates = cast(
@@ -20,12 +38,3 @@ def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:
     )
 
     return geo_coordinates
-
-def _get_url(ipv4_address: Opt[str]) -> str:
-    url: str = 'https://ipinfo.io/'
-
-    if ipv4_address is not None:
-        url += f"{ipv4_address}/"
-
-    url += 'json'
-    return url
