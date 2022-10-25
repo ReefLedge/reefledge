@@ -1,5 +1,6 @@
 import os
 import logging
+import sys
 
 from .utils.filesystem_utils import remove_directory, extract_zip_file
 from .ftp_client import FTPClientPublic
@@ -22,6 +23,7 @@ def _setup() -> None:
 
     if 'reefledge' in os.listdir():
         if __version_mismatch():
+            __unload_reefledge_compiled_cython_package()
             os.rename('reefledge', 'garbage')
             __download_reefledge_compiled_cython_package()
     else:
@@ -39,6 +41,12 @@ def __version_mismatch() -> bool:
         return True
     else:
         return (wrapper_version != cython_package_version)
+
+def __unload_reefledge_compiled_cython_package() -> None:
+    k: str
+    for k in sys.modules.copy():
+        if 'reefledge.reefledge' in k:
+            sys.modules.pop(k)
 
 def __download_reefledge_compiled_cython_package() -> None:
     with FTPClientPublic() as ftp_client:
