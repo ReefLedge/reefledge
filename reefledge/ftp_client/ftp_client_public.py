@@ -19,7 +19,10 @@ class FTPClientPublic(FTPClient):
         try:
             self._probe_data_connection()
         except TimeoutError:
-            if INSTALLING_REEFLEDGE_EXCEL_ADDIN:
+            if not self.trust_server_pasv_ipv4_address:
+                self.trust_server_pasv_ipv4_address = True
+                self.__enter__()
+            elif INSTALLING_REEFLEDGE_EXCEL_ADDIN:
                 raise # Since the target folder is available locally...
             else:
                 self.cafile = None
