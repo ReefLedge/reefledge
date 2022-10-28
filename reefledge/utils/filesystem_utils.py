@@ -1,4 +1,4 @@
-from typing import Final, List, Callable
+from typing import Final, List
 import shutil
 import os
 import stat
@@ -9,8 +9,8 @@ from zipfile import ZipFile
 from .environment import Environment as Env
 
 ON_LINUX: Final[bool] = Env.ON_LINUX
-ON_WINDOWS: Final[bool] = Env.ON_WINDOWS
 ON_MAC_OS: Final[bool] = Env.ON_MAC_OS
+ON_WINDOWS: Final[bool] = Env.ON_WINDOWS
 
 
 def remove_directory(directory_name: str) -> None:
@@ -23,11 +23,7 @@ def remove_directory(directory_name: str) -> None:
 
 def _remove_directory_platform_specific(directory_name: str) -> None:
     __change_file_permissions(root_directory_name=directory_name)
-
-    if ' ' in directory_name:
-        directory_name = ('"' + directory_name + '"')
-
-    shell_command: str = __assemble_shell_command(directory_name)
+    shell_command: List[str] = __assemble_shell_command(directory_name)
     __remove_directory_via_subprocess(shell_command, directory_name)
 
 def __change_file_permissions(*, root_directory_name: str) -> None:
@@ -45,36 +41,34 @@ def __change_file_permissions(*, root_directory_name: str) -> None:
             file_path = os.path.join(dir_name, file_name)
             change_single_file_permissions(file_path)
 
-def __assemble_shell_command(target_directory_name: str) -> str:
-    shell_command: str
+def __assemble_shell_command(target_directory_name: str) -> List[str]:
     if (ON_LINUX or ON_MAC_OS):
-        shell_command = f'rm -rf {target_directory_name}'
+        shell_command = ['rm', '-rf', target_directory_name]
     elif ON_WINDOWS:
-        shell_command = f'rmdir /s /q {target_directory_name}'
+        shell_command = ['rmdir', '/s', '/q', target_directory_name]
     else:
         raise OSError('Unsupported operating system.')
 
     return shell_command
 
 def __remove_directory_via_subprocess(
-    shell_command: str,
+    shell_command: List[str],
     directory_name: str
 ) -> None:
-    is_sudo_command: Callable[[str], bool] = \
-        lambda command: command.startswith('sudo')
+    completed_process: subprocess.CompletedProcess = subprocess.run(
+        shell_command,
+        shell=True
+    )
 
-    shell_command_split: List[str] = shell_command.split(' ')
-    completed_process = subprocess.run(shell_command_split)
-
-    if completed_process.returncode != 0:
-        if (not ON_WINDOWS) and (not is_sudo_command(shell_command)):
+    if (completed_process.returncode != 0):
+        if (not ON_WINDOWS) and ('sudo' not in shell_command):
             __remove_directory_via_subprocess(
-                shell_command=('sudo ' + shell_command),
+                shell_command=(['sudo'] + shell_command),
                 directory_name=directory_name
             )
         else:
             warnings.warn(f'''
-                Failed to remove the {directory_name} directory.
+                Failed to remove the "{directory_name}" directory.
                 Please remove it manually, if possible.
             ''')
 
