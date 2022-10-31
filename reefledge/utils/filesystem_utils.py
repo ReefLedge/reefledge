@@ -57,7 +57,7 @@ def __remove_directory_via_subprocess(
 ) -> None:
     completed_process: subprocess.CompletedProcess = subprocess.run(
         shell_command,
-        shell=True
+        shell=ON_WINDOWS
     )
 
     if (completed_process.returncode != 0):
