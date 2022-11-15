@@ -11,5 +11,5 @@ else:
 
 # Do NOT use double quotes!
 # Example (without type annotation): __version__ = '1.4.0' + '-beta.20'
-__version__: Final[str] = '1.5.1'
+__version__: Final[str] = '1.5.2'
 """Package version number"""
