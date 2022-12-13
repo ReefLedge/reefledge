@@ -5,10 +5,10 @@ import warnings
 import requests
 from requests.exceptions import SSLError
 
-PAIR: TypeAlias = Tuple[float, float]
+Pair: TypeAlias = Tuple[float, float]
 
 
-def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:
+def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> Pair:
     data = _get_data_in_json_format(ipv4_address)
     geo_coordinates = _extract_geo_coordinates(data)
 
@@ -37,12 +37,12 @@ def __assemble_url(ipv4_address: Opt[str]) -> str:
     return url
 
 
-def _extract_geo_coordinates(data: Dict[str, str]) -> PAIR:
+def _extract_geo_coordinates(data: Dict[str, str]) -> Pair:
     _geo_coordinates: List[str] = data['loc'].split(',')
     assert len(_geo_coordinates) == 2
 
     geo_coordinates = cast(
-        PAIR,
+        Pair,
         tuple([float(c) for c in _geo_coordinates])
     )
 

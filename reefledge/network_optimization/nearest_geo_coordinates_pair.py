@@ -3,38 +3,40 @@ from functools import cached_property
 from math import radians, sin, cos, asin, sqrt
 
 import numpy as np
+from pydantic import NonNegativeFloat
 
 from .ipv4_address_to_geo_coordinates import ipv4_address_to_geo_coordinates
 
 
 class NearestGeoCoordinatesPair():
 
-    load_bal_geo_coordinates_pairs: List[Tuple[float, float]]
+    load_balanc_geo_coordinates_pairs: List[Tuple[float, float]]
+    client_ipv4_address: Optional[str]
 
     def __init__(
         self,
         load_bal_geo_coordinates_pairs: List[Tuple[float, float]],
         client_ipv4_address: Optional[str]
     ) -> None:
-        self.load_bal_geo_coordinates_pairs = load_bal_geo_coordinates_pairs
+        self.load_balanc_geo_coordinates_pairs = load_bal_geo_coordinates_pairs
         self.client_ipv4_address = client_ipv4_address
 
     @cached_property
-    def host_geo_coordinates_pair(self) -> Tuple[float, float]:
+    def client_geo_coordinates_pair(self) -> Tuple[float, float]:
         return ipv4_address_to_geo_coordinates(self.client_ipv4_address)
 
 
     @property
     def index(self) -> np.int64:
-        distances: List[float] = []
+        distances: List[NonNegativeFloat] = []
         self._compute_distances(distances)
 
         return np.argmin(distances)
 
-    def _compute_distances(self, distances: List[float]) -> None:
-        for lb_geo_coordinates_pair in self.load_bal_geo_coordinates_pairs:
+    def _compute_distances(self, distances: List[NonNegativeFloat]) -> None:
+        for lb_geo_coordinates_pair in self.load_balanc_geo_coordinates_pairs:
             haversine_dist = self.__class__.haversine_distance([
-                self.host_geo_coordinates_pair,
+                self.client_geo_coordinates_pair,
                 lb_geo_coordinates_pair,
             ])
 
@@ -42,7 +44,9 @@ class NearestGeoCoordinatesPair():
 
 
     @staticmethod
-    def haversine_distance(pairs: List[Tuple[float, float]], /) -> float:
+    def haversine_distance(
+        pairs: List[Tuple[float, float]], /
+    ) -> NonNegativeFloat:
         assert len(pairs) == 2
         R: Final[float] = 6371 # Radius of earth in kilometers.
 
