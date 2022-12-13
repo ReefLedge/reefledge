@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Optional, List, Tuple
 from functools import cached_property
 
 import numpy as np
@@ -11,14 +11,18 @@ class OptimalRemoteZipFileFinder():
 
     target_remote_dir_name: str
     ftp_client: FTPClientPublic
+    client_ipv4_address: Optional[str]
 
     def __init__(
         self,
         target_remote_dir_name: List[str],
-        ftp_client: FTPClientPublic) -> None:
-        ################################################################
+        ftp_client: FTPClientPublic,
+        *,
+        client_ipv4_address: Optional[str]
+    ) -> None:
         self.target_remote_dir_name = '/'.join(target_remote_dir_name)
         self.ftp_client = ftp_client
+        self.client_ipv4_address = client_ipv4_address
 
 
     @cached_property
@@ -43,4 +47,9 @@ class OptimalRemoteZipFileFinder():
 
     @property
     def optimal_idx(self) -> np.int64:
-        return NearestGeoCoordinatesPair(self.geo_coordinates_pairs).index
+        nearest_geo_coordinates_pair = NearestGeoCoordinatesPair(
+            self.geo_coordinates_pairs,
+            self.client_ipv4_address
+        )
+
+        return nearest_geo_coordinates_pair.index

@@ -1,10 +1,11 @@
+from typing_extensions import TypeAlias
 from typing import Tuple, Optional as Opt, Dict, Union, List, cast
 import warnings
 
 import requests
 from requests.exceptions import SSLError
 
-PAIR = Tuple[float, float]
+PAIR: TypeAlias = Tuple[float, float]
 
 
 def ipv4_address_to_geo_coordinates(ipv4_address: Opt[str] = None) -> PAIR:

@@ -1,4 +1,5 @@
-from typing import List, Tuple, Final
+from typing import List, Tuple, Optional, Final
+from functools import cached_property
 from math import radians, sin, cos, asin, sqrt
 
 import numpy as np
@@ -9,14 +10,18 @@ from .ipv4_address_to_geo_coordinates import ipv4_address_to_geo_coordinates
 class NearestGeoCoordinatesPair():
 
     load_bal_geo_coordinates_pairs: List[Tuple[float, float]]
-    host_geo_coordinates_pair: Tuple[float, float]
 
     def __init__(
         self,
-        load_bal_geo_coordinates_pairs: List[Tuple[float, float]]) -> None:
-        #######################################################################
+        load_bal_geo_coordinates_pairs: List[Tuple[float, float]],
+        client_ipv4_address: Optional[str]
+    ) -> None:
         self.load_bal_geo_coordinates_pairs = load_bal_geo_coordinates_pairs
-        self.host_geo_coordinates_pair = ipv4_address_to_geo_coordinates()
+        self.client_ipv4_address = client_ipv4_address
+
+    @cached_property
+    def host_geo_coordinates_pair(self) -> Tuple[float, float]:
+        return ipv4_address_to_geo_coordinates(self.client_ipv4_address)
 
 
     @property
