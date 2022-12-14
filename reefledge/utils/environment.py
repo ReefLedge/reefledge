@@ -1,4 +1,5 @@
 from typing import Final
+from typing_extensions import assert_never
 import sys
 
 PLATFORM: Final[str] = sys.platform
@@ -10,19 +11,10 @@ class Environment():
     ON_MAC_OS: Final[bool] = (PLATFORM == 'darwin')
     ON_WINDOWS: Final[bool] = (PLATFORM[:3] == 'win') or (PLATFORM == 'cygwin')
 
-    os_name: str
-
-    def __init__(self) -> None:
-        self._set_os_name()
-
-    def _set_os_name(self) -> None:
-        if self.__class__.ON_LINUX:
-            self.os_name = 'linux'
-        elif self.__class__.ON_MAC_OS:
-            self.os_name = 'mac_os'
-        elif self.__class__.ON_WINDOWS:
-            self.os_name = 'windows'
-
+    @classmethod
+    def reefledge_package_version(cls) -> str:
+        from ..version import __version__ # Can only import safely at runtime.
+        return __version__
 
     @classmethod
     def python_version(cls) -> str:
@@ -30,3 +22,17 @@ class Environment():
         minor: int = sys.version_info.minor
 
         return f"{major}.{minor}"
+
+    @classmethod
+    def operating_system(cls) -> str:
+        if cls.ON_LINUX:
+            return 'linux'
+        elif cls.ON_MAC_OS:
+            return 'mac_os'
+        elif cls.ON_WINDOWS:
+            return 'windows'
+        else:
+            assert_never(...)
+
+
+Env = Environment # Alias

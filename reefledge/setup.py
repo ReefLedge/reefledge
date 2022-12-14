@@ -2,7 +2,7 @@ import os
 import logging
 
 from .utils.filesystem_utils import remove_directory
-from .utils import compiled_cython_subpackage_manager
+from .compiled_cython_subpackage import CompiledCythonSubpackageManager
 
 
 def setup() -> None:
@@ -18,11 +18,12 @@ def setup() -> None:
 def _setup() -> None:
     __remove_garbage_directory()
 
-    if 'reefledge' in os.listdir():
-        if __version_mismatch():
-            compiled_cython_subpackage_manager.update()
-    else:
-        compiled_cython_subpackage_manager.download()
+    with CompiledCythonSubpackageManager() as manager:
+        if 'reefledge' in os.listdir():
+            if __version_mismatch():
+                manager.update()
+        else:
+            manager.download()
 
 def __remove_garbage_directory() -> None:
     if (g:='garbage') in os.listdir():

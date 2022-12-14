@@ -1,18 +1,32 @@
 from typing import Final, List, Optional as Opt, Union
 
-from ..utils.environment import Environment as Env
+from ..utils.environment import Env
 from ..ftp_client import FTPClientPublic
 from .optimal_remote_zip_file_finder import OptimalRemoteZipFileFinder
 
 PYTHON_VERSION: Final[str] = Env.python_version()
 
 
-def infer_remote_zip_file_directory_name() -> List[str]: # Public function
-    from ..version import __version__ # Can only import safely at runtime.
+def assemble_remote_zip_file_directory_name( # Public function
+    *,
+    package_version: str,
+    python_version: str,
+    operating_system: str,
+) -> List[str]:
+    remote_zip_file_directory_name = [
+        package_version,
+        python_version,
+        operating_system,
+    ]
 
-    remote_zip_file_directory_name: List[str] = [__version__]
-    remote_zip_file_directory_name.append(f"python_{PYTHON_VERSION}")
-    remote_zip_file_directory_name.append(Env().os_name)
+    return remote_zip_file_directory_name
+
+def infer_remote_zip_file_directory_name() -> List[str]: # Public function
+    remote_zip_file_directory_name = assemble_remote_zip_file_directory_name(
+        package_version=Env.reefledge_package_version(),
+        python_version=f"python_{PYTHON_VERSION}",
+        operating_system=Env.operating_system()
+    )
 
     return remote_zip_file_directory_name
 

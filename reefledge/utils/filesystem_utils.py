@@ -6,7 +6,7 @@ import subprocess
 import warnings
 from zipfile import ZipFile
 
-from .environment import Environment as Env
+from .environment import Env
 
 ON_LINUX: Final[bool] = Env.ON_LINUX
 ON_MAC_OS: Final[bool] = Env.ON_MAC_OS
