@@ -32,7 +32,7 @@ class Environment():
         elif cls.ON_WINDOWS:
             return 'windows'
         else:
-            assert_never(...)
+            assert False
 
 
 Env = Environment # Alias

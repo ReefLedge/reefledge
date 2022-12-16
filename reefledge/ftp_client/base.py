@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
-from typing import Optional, final, Any
-from ftplib import FTP_TLS
+from typing import Optional, Union, final, Any
+from typing_extensions import Self
+from ftplib import FTP, FTP_TLS
 from functools import cached_property
 import os
 import ssl
@@ -14,7 +13,7 @@ class FTPClientBase(ABC):
     check_hostname: bool
     trust_server_pasv_ipv4_address: bool
 
-    ftp_tls: FTP_TLS
+    ftp: Union[FTP, FTP_TLS]
 
     def __init__(self) -> None:
         self.cafile = None
@@ -33,10 +32,8 @@ class FTPClientBase(ABC):
         return ca_file_path
 
 
-    @final
     def connect(
-        self,
-        reraise_ssl_cert_verification_error: bool = False
+        self, reraise_ssl_cert_verification_error: bool = False
     ) -> None:
         self._connect()
 
@@ -55,14 +52,13 @@ class FTPClientBase(ABC):
 
     @final
     def _enforce_tight_security(self) -> None:
-        # Enhance code readability.
-        ftp_tls = self.ftp_tls
+        assert isinstance(self.ftp, FTP_TLS)
 
-        ftp_tls.set_pasv(True) # Note: passive mode should be on by default.
-        ftp_tls.trust_server_pasv_ipv4_address = self.trust_server_pasv_addr
+        self.ftp.set_pasv(True) # Note: passive mode should be on by default.
+        self.ftp.trust_server_pasv_ipv4_address = self.trust_server_pasv_addr # type: ignore [attr-defined]
 
-        ftp_tls.auth()
-        ftp_tls.prot_p()
+        self.ftp.auth()
+        self.ftp.prot_p()
 
 
     @abstractmethod
@@ -70,11 +66,11 @@ class FTPClientBase(ABC):
         raise NotImplementedError
 
     @final
-    def _login(self, *, user_name: str, password: str) -> None:
-        self.ftp_tls.login(user=user_name, passwd=password, secure=True)
+    def _login(self, *, username: str, password: str) -> None:
+        self.ftp.login(user=username, passwd=password)
 
 
-    def __enter__(self) -> FTPClientBase:
+    def __enter__(self) -> Self: # type: ignore [valid-type]
         self.connect()
         self.login()
 
@@ -83,6 +79,6 @@ class FTPClientBase(ABC):
     @final
     def __exit__(self, *args: Any) -> None:
         try:
-            self.ftp_tls.quit()
+            self.ftp.quit()
         except:
-            self.ftp_tls.close() # Close unilaterally.
+            self.ftp.close() # Close unilaterally.

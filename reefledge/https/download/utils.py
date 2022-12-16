@@ -10,8 +10,10 @@ def extract_filename(response: Response) -> str:
     key_value_pair: str
     for key_value_pair in content_disposition_split:
         if key_value_pair.startswith(target_prefix:='filename='):
-            raw_filename = key_value_pair.removeprefix(target_prefix)
+            raw_filename = key_value_pair[len(target_prefix):]
             return _parse_filename(raw_filename)
+    else:
+        assert False # Unreachable
 
 def _parse_filename(raw_filename: str) -> str:
     quotes: Tuple[str, str] = ('"', "'")

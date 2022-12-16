@@ -3,20 +3,20 @@ from functools import cached_property
 
 import numpy as np
 
-from ..ftp_client import FTPClientPublic
+from ..ftp_client import FTPClientDownload
 from ..network_optimization import NearestGeoCoordinatesPair
 
 
 class OptimalRemoteZipFileFinder():
 
     target_remote_dir_name: str
-    ftp_client: FTPClientPublic
+    ftp_client: FTPClientDownload
     client_ipv4_address: Optional[str]
 
     def __init__(
         self,
         target_remote_directory_name: List[str],
-        ftp_client: FTPClientPublic,
+        ftp_client: FTPClientDownload,
         client_ipv4_address: Optional[str]
     ) -> None:
         self.target_remote_dir_name = '/'.join(target_remote_directory_name)

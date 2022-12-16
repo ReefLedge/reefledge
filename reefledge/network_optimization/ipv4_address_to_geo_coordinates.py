@@ -1,5 +1,5 @@
 from typing_extensions import TypeAlias
-from typing import Tuple, Optional as Opt, Dict, Union, List, cast
+from typing import Tuple, Optional as Opt, Dict, cast, List
 import warnings
 
 import requests
@@ -25,7 +25,7 @@ def _get_data_in_json_format(ipv4_address: Opt[str]) -> Dict[str, str]:
             warnings.simplefilter('ignore')
             response = requests.get(url, verify=False)
 
-    return response.json()
+    return cast(Dict[str, str], response.json())
 
 def __assemble_url(ipv4_address: Opt[str]) -> str:
     url: str = 'https://ipinfo.io/'

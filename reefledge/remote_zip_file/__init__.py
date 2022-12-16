@@ -1,7 +1,7 @@
-from typing import Final, List, Optional as Opt, Union
+from typing import Final, List, Optional, Union
 
 from ..utils.environment import Env
-from ..ftp_client import FTPClientPublic
+from ..ftp_client import FTPClientDownload
 from .optimal_remote_zip_file_finder import OptimalRemoteZipFileFinder
 
 PYTHON_VERSION: Final[str] = Env.python_version()
@@ -30,11 +30,12 @@ def infer_remote_zip_file_directory_name() -> List[str]: # Public function
 
     return remote_zip_file_directory_name
 
+
 def pick_optimal_remote_zip_file( # Public function
     *,
     target_remote_directory_name: List[str],
-    ftp_client: FTPClientPublic,
-    client_ipv4_address: Opt[str] = None
+    ftp_client: FTPClientDownload,
+    client_ipv4_address: Optional[str] = None
 ) -> str:
     finder = OptimalRemoteZipFileFinder(
         target_remote_directory_name,
@@ -46,16 +47,16 @@ def pick_optimal_remote_zip_file( # Public function
     return optimal_remote_zip_file_name
 
 
-def infer_remote_zip_file_path(ftp_client: Opt[FTPClientPublic] = None) -> str:
+def infer_remote_zip_file_path(
+    ftp_client: Optional[FTPClientDownload] = None
+) -> str:
     if ftp_client is None:
-        ftp_client = FTPClientPublic()
-
-        with ftp_client:
-            return _infer_remote_zip_file_path(ftp_client)
+        with FTPClientDownload() as ftp_client_:
+            return _infer_remote_zip_file_path(ftp_client_)
     else:
         return _infer_remote_zip_file_path(ftp_client)
 
-def _infer_remote_zip_file_path(ftp_client: FTPClientPublic) -> str:
+def _infer_remote_zip_file_path(ftp_client: FTPClientDownload) -> str:
     remote_zip_file_directory_name = infer_remote_zip_file_directory_name()
 
     zip_file_name: str = pick_optimal_remote_zip_file(

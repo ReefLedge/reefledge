@@ -1,10 +1,10 @@
 from typing import Final
 import os
 
-IS_REEFLEDGE_WEB_SERVER: Final[bool]
-try:
-    IS_REEFLEDGE_WEB_SERVER = eval(os.environ['IS_REEFLEDGE_WEB_SERVER'])
-except KeyError:
-    IS_REEFLEDGE_WEB_SERVER = False
+IS_REEFLEDGE_WEB_SERVER: Final[bool] = (
+    os.environ.get('IS_REEFLEDGE_WEB_SERVER', 'False').capitalize() ==
+    'True'
+)
 
 from .manager import Manager as CompiledCythonSubpackageManager
+__all__ = ['CompiledCythonSubpackageManager']

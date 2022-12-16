@@ -23,4 +23,4 @@ class SSLContextHTTPAdapter(HTTPAdapter):
         ssl_context.check_hostname = self.check_hostname
 
         kwargs['ssl_context'] = ssl_context
-        return super().init_poolmanager(*args, **kwargs)
+        return super().init_poolmanager(*args, **kwargs) # type: ignore [no-untyped-call]

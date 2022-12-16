@@ -13,4 +13,4 @@ else:
     rl.__doc__ = ""
     del rl
 
-    from .reefledge import *
+    from .reefledge import * # type: ignore [import]

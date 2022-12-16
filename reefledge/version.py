@@ -3,7 +3,7 @@
 from typing import Final, Dict
 
 try:
-    import pdoc
+    import pdoc # type: ignore [import]
 except ModuleNotFoundError:
     pass
 else:

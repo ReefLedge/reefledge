@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import cast
 
 from .utils.filesystem_utils import remove_directory
 from .compiled_cython_subpackage import CompiledCythonSubpackageManager
@@ -33,11 +34,11 @@ def __version_mismatch() -> bool:
     from .version import __version__ as python_wrapper_version
 
     try:
-        from .reefledge.version import __version__ as cython_subpackage_version
+        from .reefledge.version import __version__ as cython_subpackage_version # type: ignore [import]
     except ModuleNotFoundError:
         return True
     except ImportError:
         logging.getLogger('reefledge').exception('Version mismatch.')
         return True
     else:
-        return (python_wrapper_version != cython_subpackage_version)
+        return cast(bool, python_wrapper_version != cython_subpackage_version)
