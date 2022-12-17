@@ -4,6 +4,8 @@ from typing import Any
 import os
 import sys
 
+from requests import HTTPError
+
 from ..ftp_client.download import *
 from . import IS_REEFLEDGE_WEB_SERVER
 from ..remote_zip_file import infer_remote_zip_file_path
@@ -34,7 +36,10 @@ class Manager():
         if IS_REEFLEDGE_WEB_SERVER:
             self._download_via_ftp()
         else:
-            self._download_via_https()
+            try:
+                self._download_via_https()
+            except HTTPError:
+                self._download_via_ftp()
 
         extract_zip_file(self.zip_file_name)
 
