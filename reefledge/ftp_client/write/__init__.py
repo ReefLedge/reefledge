@@ -59,7 +59,12 @@ class FTPSClientWritePermissions(FTPClient):
         self.ftp.mkd(folder_name)
 
 
-    def remove_directory(self, directory_name: str) -> None:
+    def remove_directory(
+        self,
+        directory_name: str,
+        *,
+        print_report: bool = True
+    ) -> None:
         fso_name: str
         for fso_name in self.list_directory(directory_name):
             fso_path = f"{directory_name}/{fso_name}"
@@ -68,13 +73,17 @@ class FTPSClientWritePermissions(FTPClient):
                 self._delete_file(file_path=fso_path)
             except ftplib.error_perm as exception:
                 if '550 Is a directory.' in str(exception):
-                    self.remove_directory(directory_name=fso_path)
+                    self.remove_directory(
+                        directory_name=fso_path,
+                        print_report=False
+                    )
                 else:
                     raise
         else:
             self._remove_empty_directory(directory_name)
 
-        print(f'Removed directory "{directory_name}" on {self.host}')
+        if print_report:
+            print(f'Removed directory "{directory_name}" on {self.host}')
 
     def _delete_file(self, file_path: str) -> None:
         self.ftp.delete(file_path)
