@@ -1,5 +1,6 @@
 from typing import Optional, List, Tuple
 from functools import cached_property
+import ftplib
 
 import numpy as np
 
@@ -54,7 +55,11 @@ class OptimalRemoteZipFileFinder():
 
 
     def find(self) -> str:
-        return self.remote_zip_file_names[self.optimal_idx]
+        if len(self.remote_zip_file_names) > 0:
+            return self.remote_zip_file_names[self.optimal_idx]
+        else:
+            dir_name = self.target_remote_dir_name
+            raise ftplib.error_perm(f'Remote directory "{dir_name}" is empty.')
 
     @property
     def optimal_idx(self) -> np.int64:
