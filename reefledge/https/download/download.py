@@ -23,7 +23,7 @@ def _download_file(
     url: str,
     json: Dict[str, Any]
 ) -> Tuple[Response, str]:
-    response = session.get(url, json=json, stream=True)
+    response = session.put(url, json=json, stream=True)
     response.raise_for_status()
     filename = extract_filename(response)
 
